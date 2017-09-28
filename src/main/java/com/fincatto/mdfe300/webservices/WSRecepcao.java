@@ -11,7 +11,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Holder;
 
-import com.fincatto.nfe310.NFeConfig;
 import com.fincatto.nfe310.assinatura.AssinaturaDigital;
 import com.fincatto.mdfe300.classes.MDFAutorizador;
 
@@ -24,6 +23,7 @@ import br.inf.portalfiscal.mdfe.wsdl.mdferecepcao.MdfeDadosMsg;
 import br.inf.portalfiscal.mdfe.wsdl.mdferecepcao.MdfeRecepcaoLoteResult;
 import br.inf.portalfiscal.mdfe.wsdl.mdferecepcao.ObjectFactory;
 import com.fincatto.mdfe300.MDFeConfig;
+import com.fincatto.mdfe300.classes.RetornoEnvioMDFe;
 
 class WSRecepcao {
 
@@ -34,7 +34,7 @@ class WSRecepcao {
         this.config = config;
     }
 
-    TRetEnviMDFe enviaMDFe(TEnviMDFe enviMDFe) throws Exception {
+    RetornoEnvioMDFe enviaMDFe(TEnviMDFe enviMDFe) throws Exception {
         br.inf.portalfiscal.mdfe.ObjectFactory factoryObject = new br.inf.portalfiscal.mdfe.ObjectFactory();
 
         JAXBContext context = JAXBContext.newInstance("br.inf.portalfiscal.mdfe");
@@ -63,6 +63,8 @@ class WSRecepcao {
         MDFeRecepcaoSoap12 port = new MDFeRecepcao(new URL(MDFAutorizador.MDFe.getMDFeRecepcao(this.config.getAmbiente()))).getMDFeRecepcaoSoap12();
         MdfeRecepcaoLoteResult result = port.mdfeRecepcaoLote(mdfeDadosMsg, holder);
 
-        return ((JAXBElement<TRetEnviMDFe>) result.getContent().get(0)).getValue();
+        RetornoEnvioMDFe retornoEnvioMDFe = new RetornoEnvioMDFe(documentoAssinado, ((JAXBElement<TRetEnviMDFe>) result.getContent().get(0)).getValue());
+
+        return retornoEnvioMDFe;
     }
 }
